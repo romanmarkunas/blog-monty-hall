@@ -4,79 +4,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static java.util.Arrays.asList;
+
 public class MontyHall {
 
+    private static final int DOOR_WITH_CAR = 2;
+
     public static void main(String[] args) throws InterruptedException {
-        int totalGuess = 0;
-        int[] carInDoorCount = new int[3];
+        long totalGuess = 0;
+        long successWithNoChange = 0;
+        long successWithChange = 0;
 
-        int successWithNoChange = 0;
-        int successWithChange = 0;
-
-        // TODO - this could be expanded on how random works up to OS level or
-        // even below, and that R3 experience and if they could avoid it by
-        // making their own generator
-
+        // TODO - this could be expanded on how random works up to OS level and why it is not affected by below
         // TODO - how results change if these are the same random
-        Random rnDoors = new Random();
-        Thread.sleep(1000);
         Random rnGuess = new Random();
-        Thread.sleep(1000);
+        Thread.sleep(4);
         Random rnOpenDoor = new Random();
 
-        for (int i = 0; i < 1_000_000; i++) {
-
-            // initialize doors with car and donkeys, 1 - is car, 0 - donkey
-            // TODO - is there a need to randomly init doors, when guess is random?
-            int doorWithCar = rnDoors.nextInt(3);
-            int[] doors = new int[3];
-            doors[doorWithCar] = 1;
-            carInDoorCount[doorWithCar] += 1;
+        while (totalGuess < 100_000_000) {
             totalGuess += 1;
 
             // make an initial guess, this also represents success, if not changing door
             int initialGuess = rnGuess.nextInt(3);
-            if (initialGuess == doorWithCar) {
+            if (initialGuess == DOOR_WITH_CAR) {
                 successWithNoChange += 1;
             }
 
-            // open one of doors
+            // open one of doors with goat
             int openedDoor = 0;
             boolean doorOpened = false;
             while (!doorOpened) {
-                int doorToOpen = rnOpenDoor.nextInt(3);
-                if (doorToOpen == initialGuess || doorToOpen == doorWithCar) {
-                    continue;
+                int doorToOpen = rnOpenDoor.nextInt(2);
+                if (doorToOpen != initialGuess) {
+                    openedDoor = doorToOpen;
+                    doorOpened = true;
                 }
-
-                openedDoor = doorToOpen;
-                doorOpened = true;
             }
 
             // change mind
             int changedDoor;
-            List<Integer> doorsLeft = new ArrayList<>();
-            doorsLeft.add(0);
-            doorsLeft.add(1);
-            doorsLeft.add(2);
+            List<Integer> doorsLeft = new ArrayList<>(asList(0, 1, 2));
             doorsLeft.remove(new Integer(openedDoor));
             doorsLeft.remove(new Integer(initialGuess));
             changedDoor = doorsLeft.get(0);
 
-            if (changedDoor == doorWithCar) {
+            if (changedDoor == DOOR_WITH_CAR) {
                 successWithChange += 1;
             }
         }
+
         // print results
-        System.out.println("How randomly is goat is put:");
-        for (int door : carInDoorCount) {
-            System.out.println(" - " + (door * 100 / (double) totalGuess) + "%");
-        }
+        System.out.println("Success with no change: " + ratioAsPercent(successWithNoChange, totalGuess) + "%");
+        System.out.println("Success no change: " + ratioAsPercent(successWithChange, totalGuess) + "%");
+    }
 
-        System.out.println();
-        System.out.println("Success with no change: " + (successWithNoChange * 100 / (double) totalGuess) + "%");
-
-        System.out.println();
-        System.out.println("Success with no change: " + (successWithChange * 100 / (double) totalGuess) + "%");
+    private static double ratioAsPercent(long quotient, long dividend) {
+        return quotient * 100 / (double) dividend;
     }
 }
