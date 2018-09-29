@@ -15,6 +15,7 @@ public class MontyHall {
         long successWithNoChange = 0;
         long successWithChange = 0;
 
+        // TODO - all this can be done with streams!
         // TODO - this could be expanded on how random works up to OS level and why it is not affected by below
         // TODO - how results change if these are the same random
         Random rnGuess = new Random();
