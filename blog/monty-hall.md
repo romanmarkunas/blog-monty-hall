@@ -2,8 +2,8 @@
 
 This article is inspired by Monty-Hall problem/paradox. Now I found this 
 paradox disturbing initially (this is why it's paradox, wink...), and decided
-to quickly model it to validate for myself. That brought idea of investigating
-how Java Random implementation works and this article. 
+to quickly model it to validate for myself. That brought idea of writing up
+all I know about Java Random API in this article.
 
 Let's start with Monty-Hall...
 
@@ -26,6 +26,8 @@ found [here](TODO link))
 shows this is incorrect. So Monty-Hall problem suggests that probabilities have 
 temporal linking as well, meaning probability depends on the moment when 
 decision is made as well as your odds.
+
+Now being done, with that let's move on to Random...
 
 ## Random
 
@@ -109,10 +111,50 @@ on this below)
 ThreadSeedGenerator, which will generate seed based on how much time OS takes
 to switch between application threads.
 
-NativeSeedGenerator is the instance that most likely to be used. 
+NativeSeedGenerator is the instance that most likely to be used. This generator
+will use random device of your OS/hardware:
+1. /dev/random/ or /dev/urandom on Unix-likes
+2. Crypto API on Windows
+These devices generate randomness based on user/OS events, e.g. interrupts
+(IO events such as keystrokes and network events, hardware timers, etc).
+The exact device used may be found in _$JAVA_HOME/lib/security/java.security_
+file under _securerandom.source_ property.
+
+Why would URLSeedGenerator ne necessary? It could be used to implement true
+random number generator, e.g. you use weather forecast from different places
+to generate randomness. This data may be supplied as web service and your
+random generator may use URL of that service to seed itself.
 
 #### Number generation
 
-## When to use 
+Number generation is similar to Random, however every generated number gets
+hashed using algorithm that is specified on SecureRandom creation. This way
+if attacker gets hold of generated values, it is harder to figure out number
+generation algorithm as they also have to brute force values to get original
+ones.
 
+#### When to use
 
+Use when you need to generate anything that is security-related: temporary
+passwords, session IDs, tokens, etc.
+
+#### /dev/random blocking
+
+I though I write this up separately , as finding this took NN man-hours to
+find out.
+
+If your system uses /dev/random, it will block until minimal level of random
+is generated. Normally OS save some randomness before restart and no
+blocking happens. However, if you launch containerized application, there is
+nothing stored since last launch and you will have to wait. This may take
+_very_ long time (I saw this taking over 1 hour on Amazon EC instance),
+especially if you run it on server setting when no one is pressing keyboard.
+
+Be wary that some Java components use SecureRandom under the hood, e.g.
+UUID (when it generates IDs) or File (when creating temporary files), so you
+may encounter this in situations outside secure domain.
+
+## In place of conclusion
+
+Hopefully this sheds some light on how Java random number generators work
+under the hood. Thanks for reading and stay safe!
