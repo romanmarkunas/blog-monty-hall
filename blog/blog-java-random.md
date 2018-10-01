@@ -4,7 +4,7 @@ This article is inspired by Monty-Hall problem/paradox. Now I found this
 paradox disturbing initially (this is why it's paradox, wink...), and decided
 to quickly model it to validate for myself. That brought idea of writing up
 all I know about Java Random API in this article. If you want to read about
-paradox itself click [here](TODO link)
+paradox itself click [here](http://romanmarkunas.com/web/blog/monty-hall-problem/)
 
 ## Random
 
@@ -41,10 +41,10 @@ to what is achieved by having same seed from the start.
 
 At this point you may feel that aforementioned predictability may break security
 of system, if Random is used to generate tokens, passwords, IDs, etc. In fact 
-you [can calculate](https://jazzy.id.au/2010/09/20/cracking_random_number_generators_part_1.html)
-Random seed using just 2 subsequent generated values. Also since
-next() returns only 32 bytes, having longer (e.g. 128-bit) token will not 
-improve security. 
+you [can calculate Random seed using just 2 subsequent generated values](
+https://jazzy.id.au/2010/09/20/cracking_random_number_generators_part_1.html).
+Also since next() returns only 32 bytes, having longer (e.g. 128-bit) token
+will not improve security.
 
 #### When to use
 
